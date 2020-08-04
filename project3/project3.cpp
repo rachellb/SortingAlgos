@@ -7,8 +7,6 @@ using namespace std;
 
 class sortElements {
 
-	friend ostream& operator<< (ostream& s, sortElements& ele);
-
 protected:
 	int numElements; //Number of elements of the array
 	int* elements; //dynamic array with the elements of type int
@@ -49,19 +47,24 @@ void sortElements::generateRandom(int seed, int lower, int upper) {
 	}
 }
 
-ostream& operator << (ostream& s, sortElements& ele) { //This line taken from pg 146 of book
 
-	for (int i = 0; i < ele.numElements; i++)
-	{
+void sortElements::displayElements(int* arr) {
+	for (int i = 0; i < numElements; i++) {
 		if (i > 0)
 		{
-			s << ' '; //Prints a space between all elements, but not before first
+			cout << ' '; //Prints a space between all elements, but not before first
 		}
-		s << ele.elements[i]; //Prints the given element
+		cout << arr[i]; //Prints the given element
 	}
-	s << endl; //Ends with an endline
+	cout << endl;
+}
 
-	return s;
+int* sortElements::getElementsArray() {
+	return elements;
+}
+
+int sortElements::getnumElements() {
+	return numElements;
 }
 
 int main() {
@@ -69,7 +72,7 @@ int main() {
 	sortElements* a = new sortElements(5);
 	a->generateRandom(1, 0, 20);
 
-	cout << *a;
+	a->displayElements(a->getElementsArray());
 
 	return 0;
 }
