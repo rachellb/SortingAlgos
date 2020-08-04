@@ -18,12 +18,12 @@ public:
 	sortElements(int n); // non-default constructor
 	~sortElements(); // destructor
 	void generateRandom(int seed, int lower, int upper); // will generate
-	void displayElements(int* arr); // display the given set
+	void displayElements(); // display the given set
 	int* getElementsArray(); // return the entire array of elements
 	int getnumElements(); // return the number of elements
 	void bubbleSort();
-	void quickSort(int* ele, int low, int high);
-	
+	void quickSort(sortElements& se, int low, int high);
+	void shellSort(); 
 	// - Extra credit – Shell and Adaptive sort methods
 };
 
@@ -52,13 +52,13 @@ void sortElements::generateRandom(int seed, int lower, int upper) {
 }
 
 
-void sortElements::displayElements(int* arr) {
+void sortElements::displayElements() {
 	for (int i = 0; i < numElements; i++) {
 		if (i > 0)
 		{
 			cout << ' '; //Prints a space between all elements, but not before first
 		}
-		cout << arr[i]; //Prints the given element
+		cout << elements[i]; //Prints the given element
 	}
 	cout << endl;
 }
@@ -82,29 +82,50 @@ void sortElements::bubbleSort()
 				swap(&elements[j], &elements[j + 1]);
 }
 
-void sortElements::quickSort(int* ele, int low, int high)
+void sortElements::quickSort(sortElements& se, int low, int high)
 {
 	if (low < high)
 	{
-		int p = partition(ele, low, high); //Partition the array
+		int p = partition(elements, low, high); //Partition the array
 
 		// Separately sort elements before  
 		// partition and after partition  
-		quickSort(ele, low, p - 1);
-		quickSort(ele, p + 1, high);
+		quickSort(se, low, p - 1);
+		quickSort(se, p + 1, high);
 	}
 }
+
+
+void sortElements::shellSort() {
+	
+	for (int inc = 0; inc < numElements; inc++) {
+		int dist;
+		int j;
+		dist = elements[inc];
+		for (int i = dist; i < numElements; i++) {
+			int item = elements[i];
+			j = i - dist;
+			while ((j >= 0) && (elements[j] > item)) {
+				elements[j + dist] = elements[j];
+				j = j - dist;
+			}
+			elements[j + dist] = item;
+		}
+
+	}
+}
+
 
 int main() {
 
 	sortElements* a = new sortElements(5);
 	a->generateRandom(1, 0, 20);
 
-	a->displayElements(a->getElementsArray());
+	(*a).displayElements();
 
-	a->quickSort(a->getElementsArray(),0,a->getnumElements()-1);
+	(*a).shellSort();
 
-	a->displayElements(a->getElementsArray());
+	(*a).displayElements();
 
 	return 0;
 }
