@@ -21,3 +21,19 @@ public:
 	// - Bubble and Quick sort methods
 	// - Extra credit – Shell and Adaptive sort methods
 };
+
+sortElements::sortElements() {
+	numElements = 0;
+	elements = new int[1];
+}
+
+sortElements::sortElements(int n) {
+	numElements = n;
+	elements = new int[n];
+}
+
+sortElements::~sortElements() {
+	if (elements != NULL) delete[] elements;
+	elements = NULL;
+	numElements = 0;
+}
