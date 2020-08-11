@@ -7,12 +7,15 @@ using namespace std;
 
 void swap(int* x, int* y); //For swapping elements of array
 int partition(int* ele, int low, int high); //For partitionaing array in quick sort
+bool isSorted(int* se, int n); //For adaptive sort
+int* merge(int* a, int an, int* b, int bn); //Also for adaptive sort
 
 class sortElements {
 
 protected:
 	int numElements; //Number of elements of the array
 	int* elements; //dynamic array with the elements of type int
+
 public:
 	sortElements(); // default constructor
 	sortElements(int n); // non-default constructor
@@ -22,9 +25,9 @@ public:
 	int* getElementsArray(); // return the entire array of elements
 	int getnumElements(); // return the number of elements
 	void bubbleSort();
-	void quickSort(sortElements& se, int low, int high);
+	void quickSort(int low, int high);
 	void shellSort(); 
-	// - Extra credit – Shell and Adaptive sort methods
+	int* adaptiveSort(int* li, int n);
 };
 
 sortElements::sortElements() {
@@ -82,7 +85,7 @@ void sortElements::bubbleSort()
 				swap(&elements[j], &elements[j + 1]);
 }
 
-void sortElements::quickSort(sortElements& se, int low, int high)
+void sortElements::quickSort(int low, int high) //I could put the list, but since it's a method of sortElements I don't think I need to
 {
 	if (low < high)
 	{
@@ -90,8 +93,8 @@ void sortElements::quickSort(sortElements& se, int low, int high)
 
 		// Separately sort elements before  
 		// partition and after partition  
-		quickSort(se, low, p - 1);
-		quickSort(se, p + 1, high);
+		quickSort(low, p - 1);
+		quickSort(p + 1, high);
 	}
 }
 
@@ -116,16 +119,57 @@ void sortElements::shellSort() {
 }
 
 
+int* sortElements::adaptiveSort(int* li, int n) { //Now returns the list
+	
+	if (n < 2) return li; //If only one, it's already sorted
+
+	//Split step
+	
+	int esize = int(ceil(double(n) / 2.0));
+	int osize = int(floor(double(n) / 2.0));
+
+	int* evens = new int(esize);
+	int* odds = new int(osize);
+
+	int lim = n / 2;
+	for (int i = 0, i2 = 0; i < lim; i++, i2++) {
+		evens[i] = li[i2]; //This needs a star here, why isn't there one?
+		i2++; //?
+		odds[i] = li[i2];
+	}
+	if (n % 2 > 0) {
+		evens[esize - 1] = li[n - 1];
+	}
+
+	//Recursive step
+	if (!isSorted(evens, esize)) evens = adaptiveSort(evens, esize); //Originally 1 14 9 
+	if (!isSorted(odds, osize)) odds = adaptiveSort(odds, osize); // Originally 7 0
+	li = merge(evens, esize, odds, osize);
+	
+	return li;
+	//delete evens;
+	//delete odds;
+}
+
+
 int main() {
 
 	sortElements* a = new sortElements(5);
-	a->generateRandom(1, 0, 20);
-
+	a->generateRandom(1, 0, 20);	
+	
 	(*a).displayElements();
 
-	(*a).shellSort();
+	int* mySort = (*a).adaptiveSort((*a).getElementsArray(), (*a).getnumElements());
+	
 
-	(*a).displayElements();
+	for (int i = 0; i < (*a).getnumElements(); i++) {
+		if (i > 0)
+		{
+			cout << ' '; //Prints a space between all elements, but not before first
+		}
+		cout << mySort[i]; //Prints the given element
+	}
+	cout << endl;
 
 	return 0;
 }
@@ -153,4 +197,45 @@ int partition(int* ele, int low, int high)
 	}
 	swap(&ele[i + 1], &ele[high]);
 	return (i + 1);
+}
+
+
+bool isSorted(int* li, int n) {
+	if (n < 2) return true;
+	int prev = li[0];
+	for (int i = 1; i < n; i++) {
+		
+		if (prev <= li[i]) {
+			prev = li[i];
+		}
+		
+		else {
+			return false;
+		}
+	}
+	return true;
+}
+
+int* merge(int* a, int an, int* b, int bn) {
+	
+	int* c = new int[an + bn];
+
+	int i = 0, j = 0, k = 0;
+	
+	while ((i < an) && (j < bn)) {
+		if (a[i] <= b[j]) {
+			c[k++] = a[i++];
+		}
+		else { 
+			c[k++] = b[j++];
+		}
+	}
+	while (i < an) {
+		c[k++] = a[i++];
+	}
+	while (j < bn) {
+		c[k++] = b[j++];
+	}
+
+	return c; //c is a pointer, merge returns a pointer to this location, so should be the sorted array
 }
